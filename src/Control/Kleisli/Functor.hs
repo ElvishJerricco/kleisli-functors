@@ -51,9 +51,12 @@ instance Monad m =>
          KleisliFunctor m (Const a) where
   kmap _ (Const c) = Const c
 
-instance (Monad m, Functor f) =>
-         KleisliFunctor m (Compose f m) where
-  kmap f (Compose a) = Compose $ (>>= f) <$> a
+-- | Functor composition. To compose with a Kleisli functor, you need
+--   either an endofunctor on Hask, or an endofunctor on @Kleisli m@.
+--   This instance chooses to compose with endofunctors on Hask.
+instance (KleisliFunctor m f, Functor g) =>
+         KleisliFunctor m (Compose g f) where
+  kmap f (Compose a) = Compose $ kmap f <$> a
 
 instance (KleisliFunctor m f, KleisliFunctor m g) =>
          KleisliFunctor m (Product f g) where
