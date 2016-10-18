@@ -39,10 +39,28 @@ kfor t f = for t (kmap f . pure)
 instance KleisliFunctor IO Concurrently where
   kmap f (Concurrently a) = Concurrently (a >>= f)
 
-concurrent :: Traversable t => t Int -> IO (t Int)
-concurrent t = runConcurrently . kfor t $ \i -> do
-  -- This block lives in `IO`,
-  -- and will be automatically concurrent with the other iterations.
+run
+  :: (Traversable t, KleisliFunctor m f, Applicative f)
+  => t Int -> f (t Int)
+run t = kfor t $ \i -> do
+  -- This block lives in 'IO',
+  -- and will be executed according to f's applicative instance.
   ...
   return x
+
+concurrent
+  :: Traversable t
+  => t Int -> Concurrently (t Int)
+concurrent = run
+
+sequential
+  :: Traversable t
+  => t Int -> IO (t Int)
+sequential = run
 ```
+
+Here, `run` is defined in terms of some concurrency strategy `f`. By
+plugging in `IO`, you get sequential operations. By plugging in
+`Concurrently`, it becomes concurrent automatically. Kleisli functors
+allow `run` to be defined so it doesn't care about the details of how
+it will be executed.
