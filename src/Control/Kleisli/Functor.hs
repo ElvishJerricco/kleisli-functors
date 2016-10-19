@@ -1,5 +1,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
 
 module Control.Kleisli.Functor where
 
@@ -150,9 +153,18 @@ ksequence_ = foldr f (pure ())
   where
     f a b = kmap id (pure a) *> b
 
--- | @g@ is a co-Kleisli-functor of @m@ if @g@ represents functors
+-- | @g@ is a co-Kleisli-functor of @m@ if @g@ represent a functor
 --   from @Hask@ to @Kleisli m@. This is the dual of
 --   @'KleisliFunctor'@.
+--
+--   Laws:
+--
+-- @
+-- -- Identity
+-- cokmap id = return
+-- -- Composition
+-- cokmap (g . f) = cokmap g <=< cokmap f
+-- @
 class Monad m =>
       CoKleisliFunctor m g where
   cokmap :: (a -> b) -> g a -> m (g b)
