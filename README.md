@@ -40,7 +40,7 @@ instance KleisliFunctor IO Concurrently where
   kmap f (Concurrently a) = Concurrently (a >>= f)
 
 run
-  :: (Traversable t, KleisliFunctor m f, Applicative f)
+  :: (Traversable t, KleisliFunctor IO f, Applicative f)
   => t Int -> f (t Int)
 run t = kfor t $ \i -> do
   -- This block lives in 'IO',
