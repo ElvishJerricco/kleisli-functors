@@ -26,15 +26,11 @@ class (CoKleisliFunctor m g, KleisliFunctor m f) =>
 
 -- | Use an adjunction with @'Identity'@ to form an isomorphism
 --   between @f@ and @m@. See also: @'coRunAdjunct'@.
-runAdjunct
-  :: KleisliAdjunction m Identity f
-  => f a -> m a
+runAdjunct :: KleisliAdjunction m Identity f => f a -> m a
 runAdjunct = counit . Identity
 
 -- | The inverse of @'runAdjunct'@.
-coRunAdjunct
-  :: KleisliAdjunction m Identity f
-  => m a -> f a
+coRunAdjunct :: KleisliAdjunction m Identity f => m a -> f a
 coRunAdjunct = leftAdjunct runIdentity
 
 -- | The monad formed by a @'KleisliAdjunction'@. Note, the dual

@@ -115,40 +115,43 @@ instance KleisliFunctor NonEmpty [] where
 --   any monad without conversions.
 ktraverse
   :: (Traversable t, KleisliFunctor m f, Applicative f)
-  => (a -> m b) -> t a -> f (t b)
+  => (a -> m b)
+  -> t a
+  -> f (t b)
 ktraverse f = traverse (kmap f . pure)
 
 -- | See @'ktraverse'@ and @'for'@.
 kfor
   :: (Traversable t, KleisliFunctor m f, Applicative f)
-  => t a -> (a -> m b) -> f (t b)
+  => t a
+  -> (a -> m b)
+  -> f (t b)
 kfor t f = for t (kmap f . pure)
 
 -- | See @'ktraverse'@ and @'sequenceA'@.
 ksequence
-  :: (Traversable t, KleisliFunctor m f, Applicative f)
-  => t (m a) -> f (t a)
+  :: (Traversable t, KleisliFunctor m f, Applicative f) => t (m a) -> f (t a)
 ksequence = sequenceA . fmap (kmap id . pure)
 
 -- | See @'ktraverse'@ and @'traverse_'@.
 ktraverse_
   :: (Foldable t, KleisliFunctor m f, Applicative f)
-  => (a -> m b) -> t a -> f ()
+  => (a -> m b)
+  -> t a
+  -> f ()
 ktraverse_ f = traverse_ (kmap f . pure)
 
 -- | See @'ktraverse'@ and @'for_'@.
 kfor_
   :: (Foldable t, KleisliFunctor m f, Applicative f)
-  => t a -> (a -> m b) -> f ()
+  => t a
+  -> (a -> m b)
+  -> f ()
 kfor_ t f = for_ t (kmap f . pure)
 
 -- | See @'ktraverse'@ and @'sequenceA_'@.
-ksequence_
-  :: (Foldable t, KleisliFunctor m f, Applicative f)
-  => t (m a) -> f ()
-ksequence_ = foldr f (pure ())
-  where
-    f a b = kmap id (pure a) *> b
+ksequence_ :: (Foldable t, KleisliFunctor m f, Applicative f) => t (m a) -> f ()
+ksequence_ = foldr f (pure ()) where f a b = kmap id (pure a) *> b
 
 -- | @g@ is a co-Kleisli-functor of @m@ if @g@ represent a functor
 --   from @Hask@ to @Kleisli m@. This is the dual of
