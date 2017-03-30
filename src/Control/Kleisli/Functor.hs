@@ -152,6 +152,10 @@ kfor_ t f = for_ t (kmap f . pure)
 ksequence_ :: (Foldable t, KleisliFunctor m f, Applicative f) => t (m a) -> f ()
 ksequence_ = foldr f (pure ()) where f a b = kmap id (pure a) *> b
 
+-- | Lift monadic computations into functors
+liftK :: (KleisliFunctor m f, Applicative f) => m a -> f a
+liftK = absorb . pure
+
 -- | @g@ is a co-Kleisli-functor of @m@ if @g@ represent a functor
 --   from @Hask@ to @Kleisli m@. This is the dual of
 --   @'KleisliFunctor'@.
