@@ -38,9 +38,19 @@ import Data.Validation
 -- -- Composition
 -- kmap (g <=< f) = kmap g . kmap f
 -- @
+--
+--   'absorb' must be equivalent to its default definition, and it
+--   should behave such that the default definition for 'kmap' is law
+--   abiding.
 class (Monad m, Functor f) =>
       KleisliFunctor m f where
+  -- | Map a monadic computation over a functor
   kmap :: (a -> m b) -> f a -> f b
+  kmap f = absorb . fmap f
+
+  -- | Absorb a monadic computation into a functor.
+  absorb :: KleisliFunctor m f => f (m a) -> f a
+  absorb = kmap id
 
 -- | Any monad is a Kleisli functor of itself.
 instance Monad m =>
