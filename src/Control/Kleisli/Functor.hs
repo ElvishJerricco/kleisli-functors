@@ -57,6 +57,10 @@ instance Monad m =>
          KleisliFunctor m m where
   kmap = (=<<)
 
+-- | 'Functor' = 'KleisliFunctor' 'Identity'
+instance Functor f => KleisliFunctor Identity f where
+  kmap f = fmap (runIdentity . f)
+
 instance Monad m =>
          KleisliFunctor m (Const a) where
   kmap _ (Const c) = Const c
