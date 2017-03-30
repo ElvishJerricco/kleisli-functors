@@ -3,24 +3,24 @@
 
 module Control.Kleisli.Functor where
 
-import Control.Concurrent.Async
-import Data.Foldable
-import Data.Functor.Compose
-import Data.Functor.Const
-import Data.Functor.Identity
-import Data.Functor.Product
-import Data.Functor.Sum
-import Data.IntMap (IntMap)
+import           Control.Applicative.Results
+import           Control.Concurrent.Async
+import           Data.Foldable
+import           Data.Functor.Compose
+import           Data.Functor.Const
+import           Data.Functor.Identity
+import           Data.Functor.Product
+import           Data.Functor.Sum
+import           Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
-import Data.List.NonEmpty (NonEmpty)
+import           Data.List.NonEmpty (NonEmpty)
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Map (Map)
+import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
-import Data.Sequence (Seq)
+import           Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
-import Data.Traversable
-import Data.Validation
+import           Data.Traversable
 
 -- | @f@ is a Kleisli functor of @m@ if @f@ represents a functor from
 --   @Kleisli m@ to @Hask@.
@@ -78,19 +78,8 @@ instance (KleisliFunctor m f, KleisliFunctor m g) =>
   kmap f (InR a) = InR (kmap f a)
 
 -- | Types that are isomorphic always form Kleisli functors.
-instance KleisliFunctor (Either e) (AccValidation e) where
-  kmap _ (AccFailure e) = AccFailure e
-  kmap f (AccSuccess a) =
-    case f a of
-      Left e -> AccFailure e
-      Right b -> AccSuccess b
-
-instance KleisliFunctor (Either e) (Validation e) where
-  kmap _ (Failure e) = Failure e
-  kmap f (Success a) =
-    case f a of
-      Left e -> Failure e
-      Right b -> Success b
+instance KleisliFunctor (Either e) (Results e) where
+  kmap f (Results a) = Results (a >>= f)
 
 instance KleisliFunctor IO Concurrently where
   kmap f (Concurrently a) = Concurrently (a >>= f)
